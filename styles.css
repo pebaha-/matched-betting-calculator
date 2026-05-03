@@ -1,49 +1,97 @@
-body {
-    font-family: Arial, sans-serif;
-    padding: 20px;
-    max-width: 350px;
-    margin: auto;
-}
-
-h1 {
-    font-size: 20px;
-}
-
-label {
-    display: block;
-    margin-top: 10px;
-}
-
-input {
-    width: 100%;
-    padding: 8px;
-    margin-top: 4px;
+* {
     box-sizing: border-box;
 }
 
-.result {
-    margin-top: 20px;
+body {
+    font-family: system-ui, -apple-system, Segoe UI, Roboto, sans-serif;
+    background: #f5f7fa;
+    margin: 0;
+    padding: 20px;
 }
 
-.row {
-    display: flex;
-    justify-content: space-between;
-    padding: 6px 0;
-    border-bottom: 1px solid #eee;
+/* Container */
+.container {
+    max-width: 420px;
+    margin: auto;
 }
 
-.label {
+/* Card */
+.card {
+    background: white;
+    padding: 20px;
+    border-radius: 12px;
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.06);
+}
+
+/* Title */
+h1 {
+    margin-top: 0;
+    font-size: 20px;
+}
+
+/* Inputs */
+label {
+    display: block;
+    margin-top: 14px;
+    font-size: 14px;
     color: #555;
 }
 
-.value {
-    font-weight: bold;
+input,
+select {
+    width: 100%;
+    padding: 10px;
+    margin-top: 6px;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    font-size: 14px;
+    transition: border 0.2s;
 }
 
+/* Result box */
+.result {
+    margin-top: 20px;
+    border-top: 1px solid #eee;
+    padding-top: 12px;
+}
+
+/* Rows */
+.row {
+    display: flex;
+    justify-content: space-between;
+    padding: 8px 0;
+}
+
+.label {
+    color: #666;
+}
+
+.value {
+    font-weight: 600;
+}
+
+/* Colors */
 .positive {
-    color: green;
+    color: #16a34a;
 }
 
 .negative {
-    color: red;
+    color: #dc2626;
+}
+
+/* Highlight main result */
+.row.highlight {
+    font-size: 18px;
+    font-weight: bold;
+}
+
+input:focus,
+select:focus {
+    outline: none;
+    border-color: #4f8cff;
+}
+
+input:hover:not(:focus),
+select:hover:not(:focus) {
+    border-color: #bbb;
 }
