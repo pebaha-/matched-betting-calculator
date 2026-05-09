@@ -48,10 +48,33 @@ function calculate(backStake, backOdds, layOdds, commission, betType, freebetRtp
             freebetValue;
     }
 
+    const bookmakerBackWin = backStake * (backOdds - 1);
+    const exchangeBackWin = -layStake * (layOdds - 1);
+    const bookmakerLayWin = -backStake;
+    const exchangeLayWin = layStake * (1 - commission);
+
+    let freebetLayWin = 0;
+
+    if (betType === "riskfree") {
+        freebetLayWin =
+            backStake * (freebetRtp / 100);
+    }
+    else if (betType === "free") {
+        freebetLayWin =
+            backStake * (freebetRtp / 100);
+    }
+
     return {
         layStake,
         profitBackWins,
-        profitLayWins
+        profitLayWins,
+
+        bookmakerBackWin,
+        exchangeBackWin,
+
+        bookmakerLayWin,
+        exchangeLayWin,
+        freebetLayWin
     };
 }
 
@@ -82,14 +105,29 @@ function update() {
         freebetRtp
     );
 
-    // Lay stake
+    // Main results
     document.getElementById("layStake").textContent = result.layStake.toFixed(2);
 
-    // Back wins
-    setValue("profitBack", result.profitBackWins);
+    // Breakdown — back wins
+    setValue("bookmakerBackWin", result.bookmakerBackWin);
+    setValue("exchangeBackWin", result.exchangeBackWin);
 
-    // Lay wins
-    setValue("profitLay", result.profitLayWins);
+    setValue("totalBackWin", result.profitBackWins);
+
+    // Breakdown — lay wins
+    setValue("bookmakerLayWin", result.bookmakerLayWin);
+
+    setValue("exchangeLayWin", result.exchangeLayWin);
+
+    const showFreebet = betType === "riskfree";
+
+    document.getElementById("freebetLayRow").style.display = showFreebet ? "flex" : "none";
+
+    setValue("totalLayWin", result.profitLayWins);
+
+    if (showFreebet) {
+        setValue("freebetLayWin", result.freebetLayWin);
+    }
 }
 
 function setValue(id, value) {

@@ -1,69 +1,227 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <link rel="stylesheet" href="styles.css">
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Matched Betting Calculator</title>
-  </head>
-  <body>
-    <div class="container">
-      <div class="card">
-        <h1>Matched Betting Calculator</h1>
+<head>
+  <meta charset="UTF-8">
 
-        <label>
-          Bet type
-          <select id="betType">
-            <option value="normal">Normal</option>
-            <option value="free">Free Bet (SNR)</option>
-            <option value="riskfree">Risk Free</option>
-          </select>
-        </label>
+  <meta
+    name="viewport"
+    content="width=device-width, initial-scale=1.0"
+  >
 
-        <label>
-          Back stake
-          <input id="backStake" type="number" step="0.01" value="100">
-        </label>
+  <title>Matched Betting Calculator</title>
 
-        <label>
-          Back odds
-          <input id="backOdds" type="number" step="0.01" value="2.0">
-        </label>
+  <link rel="stylesheet" href="styles.css">
+</head>
 
-        <label>
-          Lay odds
-          <input id="layOdds" type="number" step="0.01" value="2.1">
-        </label>
+<body>
+  <div class="container">
+    <div class="card">
+      <h1>Matched Betting Calculator</h1>
 
-        <label>
-          Commission in % (fx 6.5% for Betfair)
-          <input id="commission" type="number" step="0.01" value="6.5">
-        </label>
+      <label>
+        Bet type
 
-        <label id="rtpContainer" style="display: none;">
-          Free bet RTP (%)
-          <input type="number" id="freebetRtp" value="70" step="1">
-        </label>
+        <select id="betType">
+          <option value="normal">
+            Normal
+          </option>
 
-        <div class="result">
-          <div class="row highlight">
-            <span class="label">Lay stake</span>
-            <span class="value" id="layStake">-</span>
+          <option value="free">
+            Free Bet (SNR)
+          </option>
+
+          <option value="riskfree">
+            Risk Free
+          </option>
+        </select>
+      </label>
+
+      <label>
+        Back stake
+
+        <input
+          type="number"
+          id="backStake"
+          value="100"
+          step="0.01"
+        >
+      </label>
+
+      <label>
+        Back odds
+
+        <input
+          type="number"
+          id="backOdds"
+          value="2.0"
+          step="0.01"
+        >
+      </label>
+
+      <label>
+        Lay odds
+
+        <input
+          type="number"
+          id="layOdds"
+          value="2.0"
+          step="0.01"
+        >
+      </label>
+
+      <label>
+        Commission (%)
+
+        <input
+          type="number"
+          id="commission"
+          value="6.5"
+          step="0.1"
+        >
+      </label>
+
+      <label
+        id="rtpContainer"
+        style="display: none;"
+      >
+        Free bet RTP (%)
+
+        <input
+          type="number"
+          id="freebetRtp"
+          value="70"
+          step="1"
+        >
+      </label>
+
+      <div class="result">
+        <div class="row highlight">
+          <span class="label">
+            Lay stake
+          </span>
+
+          <span
+            class="value"
+            id="layStake"
+          >
+            -
+          </span>
+        </div>
+      </div>
+
+      <div class="breakdown">
+        <h2>Breakdown</h2>
+
+        <div class="scenario">
+          <h3>
+            If Bookmaker (Back) bet wins
+          </h3>
+
+          <div class="row">
+            <span class="label">
+              Bookmaker
+            </span>
+
+            <span
+              class="value"
+              id="bookmakerBackWin"
+            >
+              -
+            </span>
           </div>
 
           <div class="row">
-            <span class="label">Profit (back wins)</span>
-            <span class="value" id="profitBack">-</span>
+            <span class="label">
+              Exchange
+            </span>
+
+            <span
+              class="value"
+              id="exchangeBackWin"
+            >
+              -
+            </span>
+          </div>
+
+          <div class="row total">
+            <span class="label">
+              Total
+            </span>
+
+            <span
+              class="value"
+              id="totalBackWin"
+            >
+              -
+            </span>
+          </div>
+        </div>
+
+        <div class="scenario">
+          <h3>
+            If Exchange (Lay) bet wins
+          </h3>
+
+          <div class="row">
+            <span class="label">
+              Bookmaker
+            </span>
+
+            <span
+              class="value"
+              id="bookmakerLayWin"
+            >
+              -
+            </span>
           </div>
 
           <div class="row">
-            <span class="label">Profit (lay wins)</span>
-            <span class="value" id="profitLay">-</span>
+            <span class="label">
+              Exchange
+            </span>
+
+            <span
+              class="value"
+              id="exchangeLayWin"
+            >
+              -
+            </span>
+          </div>
+
+          <div
+            class="row"
+            id="freebetLayRow"
+            style="display: none;"
+          >
+            <span class="label">
+              Free Bet
+            </span>
+
+            <span
+              class="value"
+              id="freebetLayWin"
+            >
+              -
+            </span>
+          </div>
+
+          <div class="row total">
+            <span class="label">
+              Total
+            </span>
+
+            <span
+              class="value"
+              id="totalLayWin"
+            >
+              -
+            </span>
           </div>
         </div>
       </div>
     </div>
+  </div>
 
-    <script src="script.js"></script>
-  </body>
+  <script src="script.js"></script>
+</body>
 </html>

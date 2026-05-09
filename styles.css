@@ -95,3 +95,31 @@ input:hover:not(:focus),
 select:hover:not(:focus) {
     border-color: #bbb;
 }
+
+.breakdown {
+    margin-top: 24px;
+    padding-top: 20px;
+    border-top: 1px solid #eee;
+}
+
+.breakdown h2 {
+    margin: 0 0 16px;
+    font-size: 18px;
+}
+
+.scenario {
+    margin-top: 20px;
+}
+
+.scenario h3 {
+    margin-bottom: 10px;
+    font-size: 15px;
+    color: #444;
+}
+
+.total {
+    margin-top: 8px;
+    padding-top: 8px;
+    border-top: 1px solid #eee;
+    font-weight: 600;
+}
