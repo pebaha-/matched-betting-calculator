@@ -1,38 +1,92 @@
+/* Reset-ish */
 * {
     box-sizing: border-box;
 }
 
 body {
-    font-family: system-ui, -apple-system, Segoe UI, Roboto, sans-serif;
+    font-family:
+        system-ui,
+        -apple-system,
+        BlinkMacSystemFont,
+        "Segoe UI",
+        sans-serif;
+
     background: #f5f7fa;
+
     margin: 0;
-    padding: 20px;
+    padding: 24px;
+
+    color: #222;
 }
 
-/* Container */
+/* Layout */
 .container {
-    max-width: 420px;
+    max-width: 1100px;
     margin: auto;
 }
 
-/* Card */
-.card {
-    background: white;
-    padding: 20px;
-    border-radius: 12px;
-    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.06);
+.panel {
+    display: grid;
+
+    grid-template-columns: 320px 1fr;
+
+    gap: 24px;
+
+    align-items: stretch;
 }
 
-/* Title */
+/* Cards */
+.card {
+    background: white;
+
+    padding: 24px;
+
+    border-radius: 14px;
+
+    box-shadow:
+        0 8px 24px rgba(0, 0, 0, 0.06);
+}
+
+/* Sticky calculator on large screens */
+@media (min-width: 1000px) {
+    .card:first-child {
+        position: sticky;
+        top: 24px;
+
+        align-self: start;
+    }
+}
+
+/* Typography */
 h1 {
     margin-top: 0;
-    font-size: 20px;
+    margin-bottom: 20px;
+
+    font-size: 24px;
+}
+
+h2 {
+    margin-top: 0;
+    margin-bottom: 16px;
+
+    font-size: 18px;
+}
+
+h3 {
+    margin-top: 0;
+    margin-bottom: 12px;
+
+    font-size: 15px;
+
+    color: #444;
 }
 
 /* Inputs */
 label {
     display: block;
-    margin-top: 14px;
+
+    margin-top: 16px;
+
     font-size: 14px;
     color: #555;
 }
@@ -40,28 +94,75 @@ label {
 input,
 select {
     width: 100%;
-    padding: 10px;
+
     margin-top: 6px;
+    padding: 10px 12px;
+
     border: 1px solid #ddd;
     border-radius: 8px;
+
     font-size: 14px;
-    transition: border 0.2s;
+
+    transition:
+        border-color 0.15s ease,
+        box-shadow 0.15s ease;
 }
 
-/* Result box */
+input:hover:not(:focus),
+select:hover:not(:focus) {
+    border-color: #bbb;
+}
+
+input:focus,
+select:focus {
+    outline: none;
+
+    border-color: #4f8cff;
+
+    box-shadow:
+        0 0 0 3px rgba(79, 140, 255, 0.15);
+}
+
+/* Result */
 .result {
-    margin-top: 20px;
+    margin-bottom: 24px;
+}
+
+.highlight {
+    font-size: 18px;
+    font-weight: 600;
+}
+
+/* Breakdown */
+.breakdown {
     border-top: 1px solid #eee;
-    padding-top: 12px;
+    padding-top: 20px;
+}
+
+.scenario+.scenario {
+    margin-top: 28px;
 }
 
 /* Rows */
 .row {
     display: flex;
+
     justify-content: space-between;
-    padding: 8px 0;
+    align-items: center;
+
+    padding: 6px 0;
 }
 
+.total {
+    margin-top: 10px;
+    padding-top: 10px;
+
+    border-top: 1px solid #eee;
+
+    font-weight: 600;
+}
+
+/* Text */
 .label {
     color: #666;
 }
@@ -70,7 +171,7 @@ select {
     font-weight: 600;
 }
 
-/* Colors */
+/* Profit colors */
 .positive {
     color: #16a34a;
 }
@@ -79,47 +180,17 @@ select {
     color: #dc2626;
 }
 
-/* Highlight main result */
-.row.highlight {
-    font-size: 18px;
-    font-weight: bold;
-}
+/* Mobile */
+@media (max-width: 800px) {
+    body {
+        padding: 16px;
+    }
 
-input:focus,
-select:focus {
-    outline: none;
-    border-color: #4f8cff;
-}
+    .panel {
+        grid-template-columns: 1fr;
+    }
 
-input:hover:not(:focus),
-select:hover:not(:focus) {
-    border-color: #bbb;
-}
-
-.breakdown {
-    margin-top: 24px;
-    padding-top: 20px;
-    border-top: 1px solid #eee;
-}
-
-.breakdown h2 {
-    margin: 0 0 16px;
-    font-size: 18px;
-}
-
-.scenario {
-    margin-top: 20px;
-}
-
-.scenario h3 {
-    margin-bottom: 10px;
-    font-size: 15px;
-    color: #444;
-}
-
-.total {
-    margin-top: 8px;
-    padding-top: 8px;
-    border-top: 1px solid #eee;
-    font-weight: 600;
+    .card:first-child {
+        position: static;
+    }
 }
