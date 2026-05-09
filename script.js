@@ -1,24 +1,52 @@
-function calculate(backStake, backOdds, layOdds, commission, betType) {
+function calculate(backStake, backOdds, layOdds, commission, betType, freebetRtp) {
     let layStake;
-    const commissionPct = commission / 100;
+
+    if (betType === "normal") {
+        layStake =
+            (backStake * backOdds) /
+            (layOdds - commission);
+    }
 
     if (betType === "free") {
-        // Free bet (SNR)
-        layStake = (backStake * (backOdds - 1)) / (layOdds - commissionPct);
-    } else {
-        // Normal bet
-        layStake = (backStake * backOdds) / (layOdds - commissionPct);
+        layStake =
+            (backStake * (backOdds - 1)) /
+            (layOdds - commission);
+    }
+
+    if (betType === "riskfree") {
+        const rtp = freebetRtp / 100;
+
+        layStake =
+            (backStake * (backOdds - rtp)) /
+            (layOdds - commission);
     }
 
     const profitBackWins =
-        (betType === "free"
-            ? backStake * (backOdds - 1)
-            : backStake * (backOdds - 1)) -
-        (layStake * (layOdds - 1));
+        backStake * (backOdds - 1) -
+        layStake * (layOdds - 1);
 
-    const profitLayWins =
-        (layStake * (1 - commissionPct)) -
-        (betType === "free" ? 0 : backStake);
+    let profitLayWins;
+
+    if (betType === "normal") {
+        profitLayWins =
+            layStake * (1 - commission) -
+            backStake;
+    }
+
+    if (betType === "free") {
+        profitLayWins =
+            layStake * (1 - commission);
+    }
+
+    if (betType === "riskfree") {
+        const freebetValue =
+            backStake * (freebetRtp / 100);
+
+        profitLayWins =
+            layStake * (1 - commission) -
+            backStake +
+            freebetValue;
+    }
 
     return {
         layStake,
@@ -32,24 +60,36 @@ function getFloatFromElement(elementId) {
 }
 
 function update() {
-    const backStake = getFloatFromElement("backStake");
-    const backOdds = getFloatFromElement("backOdds");
-    const layOdds = getFloatFromElement("layOdds");
-    const commission = getFloatFromElement("commission");
+    const backStake = getFloatFromElement("backStake") || 0;
+    const backOdds = getFloatFromElement("backOdds") || 0;
+    const layOdds = getFloatFromElement("layOdds") || 0;
+    const freebetRtp = getFloatFromElement("freebetRtp") || 0;
+    const commission = (getFloatFromElement("commission") || 0) / 100;
     const betType = document.getElementById("betType").value;
 
-    if ([backStake, backOdds, layOdds, commission].some(isNaN)) return;
+    // Show / hide RTP input
+    const rtpContainer = document.getElementById("rtpContainer");
 
-    const result = calculate(backStake, backOdds, layOdds, commission, betType);
+    rtpContainer.style.display = betType === "riskfree" ? "block" : "none";
 
-    document.getElementById("layStake").textContent =
-        result.layStake.toFixed(2);
+    // Calculate
+    const result = calculate(
+        backStake,
+        backOdds,
+        layOdds,
+        commission,
+        betType,
+        freebetRtp
+    );
 
-    document.getElementById("profitBack").textContent =
-        result.profitBackWins.toFixed(2);
+    // Lay stake
+    document.getElementById("layStake").textContent = result.layStake.toFixed(2);
 
-    setValue("profitLay", result.profitLayWins);
+    // Back wins
     setValue("profitBack", result.profitBackWins);
+
+    // Lay wins
+    setValue("profitLay", result.profitLayWins);
 }
 
 function setValue(id, value) {

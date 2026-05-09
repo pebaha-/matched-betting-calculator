@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="da">
+<html lang="en">
   <head>
     <link rel="stylesheet" href="styles.css">
     <meta charset="UTF-8" />
@@ -16,6 +16,7 @@
           <select id="betType">
             <option value="normal">Normal</option>
             <option value="free">Free Bet (SNR)</option>
+            <option value="riskfree">Risk Free</option>
           </select>
         </label>
 
@@ -39,7 +40,12 @@
           <input id="commission" type="number" step="0.01" value="6.5">
         </label>
 
-        <div class="result" id="result">
+        <label id="rtpContainer" style="display: none;">
+          Free bet RTP (%)
+          <input type="number" id="freebetRtp" value="70" step="1">
+        </label>
+
+        <div class="result">
           <div class="row highlight">
             <span class="label">Lay stake</span>
             <span class="value" id="layStake">-</span>
@@ -57,6 +63,7 @@
         </div>
       </div>
     </div>
+
     <script src="script.js"></script>
   </body>
 </html>
