@@ -186,6 +186,10 @@ select:focus {
         padding: 16px;
     }
 
+    .container {
+        max-width: 320px;
+    }
+
     .panel {
         grid-template-columns: 1fr;
     }
