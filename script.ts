@@ -1,5 +1,12 @@
-function calculate(backStake, backOdds, layOdds, commission, betType, freebetRtp) {
-    let layStake;
+function calculate(
+    backStake: number,
+    backOdds: number,
+    layOdds: number,
+    commission: number,
+    betType: string,
+    freebetRtp: number
+) {
+    let layStake = 0;
 
     if (betType === "normal") {
         layStake =
@@ -25,7 +32,7 @@ function calculate(backStake, backOdds, layOdds, commission, betType, freebetRtp
         backStake * (backOdds - 1) -
         layStake * (layOdds - 1);
 
-    let profitLayWins;
+    let profitLayWins = 0;
 
     if (betType === "normal") {
         profitLayWins =
@@ -78,20 +85,26 @@ function calculate(backStake, backOdds, layOdds, commission, betType, freebetRtp
     };
 }
 
-function getFloatFromElement(elementId) {
-    return parseFloat(document.getElementById(elementId).value);
+function getFloatFromElement(elementId: string): number | void {
+    let element = document.getElementById(elementId) as HTMLInputElement;
+    if (!element) {
+        console.error(`Element with ID "${elementId}" not found.`);
+        return;
+    }
+    return parseFloat(element.value);
 }
 
-function update() {
+function update(): void {
     const backStake = getFloatFromElement("backStake") || 0;
     const backOdds = getFloatFromElement("backOdds") || 0;
     const layOdds = getFloatFromElement("layOdds") || 0;
     const freebetRtp = getFloatFromElement("freebetRtp") || 0;
     const commission = (getFloatFromElement("commission") || 0) / 100;
-    const betType = document.getElementById("betType").value;
+    const betTypeElement = document.getElementById("betType") as HTMLSelectElement;
+    const betType = betTypeElement.value;
 
     // Show / hide RTP input
-    const rtpContainer = document.getElementById("rtpContainer");
+    const rtpContainer = document.getElementById("rtpContainer") as HTMLElement;
 
     rtpContainer.style.display = betType === "riskfree" ? "block" : "none";
 
@@ -106,7 +119,9 @@ function update() {
     );
 
     // Main results
-    document.getElementById("layStake").textContent = result.layStake.toFixed(2);
+    const layStake = result.layStake;
+    const layStakeElement = document.getElementById("layStake") as HTMLElement;
+    layStakeElement.textContent = layStake.toFixed(2);
 
     // Breakdown — back wins
     setValue("bookmakerBackWin", result.bookmakerBackWin);
@@ -121,7 +136,8 @@ function update() {
 
     const showFreebet = betType === "riskfree";
 
-    document.getElementById("freebetLayRow").style.display = showFreebet ? "flex" : "none";
+    const freebetLayRow = document.getElementById("freebetLayRow") as HTMLElement;
+    freebetLayRow.style.display = showFreebet ? "flex" : "none";
 
     setValue("totalLayWin", result.profitLayWins);
 
@@ -130,8 +146,8 @@ function update() {
     }
 }
 
-function setValue(id, value) {
-    const el = document.getElementById(id);
+function setValue(id: string, value: number): void {
+    const el = document.getElementById(id) as HTMLElement;
     el.textContent = value.toFixed(2);
     el.className = "value " + (value < 0 ? "negative" : "positive");
 }

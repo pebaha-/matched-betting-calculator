@@ -2,9 +2,11 @@
   "name": "matched-betting-calculator",
   "version": "1.0.0",
   "description": "",
-  "main": "script.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "build": "tsc",
+    "check": "tsc --noEmit",
+    "watch": "tsc --watch"
   },
   "keywords": [],
   "author": "",
@@ -12,6 +14,7 @@
   "type": "module",
   "devDependencies": {
     "eslint": "^10.3.0",
-    "globals": "^17.6.0"
+    "globals": "^17.6.0",
+    "typescript": "^7.0.2"
   }
 }
