@@ -1,9 +1,17 @@
+type BetType = 'normal' | 'free' | 'riskfree'
+
+function isBetType(value: string): value is BetType {
+    return value === "normal"
+        || value === "free"
+        || value === "riskfree";
+}
+
 function calculate(
     backStake: number,
     backOdds: number,
     layOdds: number,
     commission: number,
-    betType: string,
+    betType: BetType,
     freebetRtp: number
 ) {
     let layStake = 0;
@@ -100,9 +108,19 @@ function update(): void {
     const layOdds = getFloatFromElement("layOdds") || 0;
     const freebetRtp = getFloatFromElement("freebetRtp") || 0;
     const commission = (getFloatFromElement("commission") || 0) / 100;
-    const betTypeElement = document.getElementById("betType") as HTMLSelectElement;
-    const betType = betTypeElement.value;
+    const betTypeElement = document.getElementById("betType");
 
+    if (!(betTypeElement instanceof HTMLSelectElement)) {
+        throw new Error('Select element with ID "betType" not found.');
+    }
+
+    const value = betTypeElement.value;
+
+    if (!isBetType(value)) {
+        throw new Error(`Invalid bet type: "${value}"`);
+    }
+
+    const betType: BetType = value;
     // Show / hide RTP input
     const rtpContainer = document.getElementById("rtpContainer") as HTMLElement;
 
