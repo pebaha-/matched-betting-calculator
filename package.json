@@ -3,18 +3,24 @@
   "version": "1.0.0",
   "description": "",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "build": "tsc",
-    "check": "tsc --noEmit",
-    "watch": "tsc --watch"
+    "dev": "vite",
+    "build": "vue-tsc --noEmit && vite build",
+    "preview": "vite preview",
+    "check": "vue-tsc --noEmit"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "type": "module",
   "devDependencies": {
+    "@vitejs/plugin-vue": "^6.0.8",
     "eslint": "^10.3.0",
     "globals": "^17.6.0",
-    "typescript": "^7.0.2"
+    "typescript": "^6.0.3",
+    "vite": "^8.1.5",
+    "vue-tsc": "^3.3.8"
+  },
+  "dependencies": {
+    "vue": "^3.5.40"
   }
 }
