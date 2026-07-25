@@ -15,3 +15,5 @@ yarn-error.log*
 
 # TS build output
 dist/
+
+*.tsbuildinfo
