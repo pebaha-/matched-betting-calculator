@@ -91,11 +91,3 @@ export function calculate(
         freebetLayWin
     };
 }
-
-function isBetType(value: string): value is BetType {
-    return value === "normal"
-        || value === "free"
-        || value === "riskfree";
-
-
-}
