@@ -1,17 +1,17 @@
 pre-commit:
+  fail_on_changes: always
   parallel: true
   jobs:
     - name: format
       glob: "*.{js,ts,vue,json,css,html,md,yaml,yml}"
       run: pnpm exec oxfmt --write {staged_files}
-      stage_fixed: true
 
     - name: lint
       glob: "*.{js,ts,vue}"
       run: pnpm exec oxlint --fix {staged_files}
-      stage_fixed: true
 
 pre-push:
+  fail_on_changes: always
   jobs:
     - name: build
       run: pnpm build
