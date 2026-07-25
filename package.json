@@ -2,26 +2,33 @@
   "name": "matched-betting-calculator",
   "version": "1.0.0",
   "description": "",
+  "keywords": [],
+  "license": "ISC",
+  "author": "",
+  "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "vue-tsc --noEmit && vite build",
-    "preview": "vite preview",
-    "check": "vue-tsc --noEmit"
+    "build": "vue-tsc -b && vite build",
+    "type-check": "vue-tsc -b",
+    "lint": "oxlint .",
+    "lint:fix": "oxlint .",
+    "format": "oxfmt .",
+    "format:check": "oxfmt --check .",
+    "prepare": "lefthook install"
   },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
-  "type": "module",
+  "dependencies": {
+    "vue": "^3.5.40"
+  },
   "devDependencies": {
     "@vitejs/plugin-vue": "^6.0.8",
     "eslint": "^10.3.0",
     "globals": "^17.6.0",
+    "lefthook": "^2.1.10",
+    "oxfmt": "^0.60.0",
+    "oxlint": "^1.75.0",
     "typescript": "^6.0.3",
     "vite": "^8.1.5",
     "vue-tsc": "^3.3.8"
-  },
-  "dependencies": {
-    "vue": "^3.5.40"
   },
   "packageManager": "pnpm@11.17.0+sha512.cca3cea332ad254bb84145f966d19f4879615210346fc92c79a047f23a0d7b3cca3c3792f0076ba1f1831d277efbcf0a9119b31a9a60eca7fb3d6231f331ef72"
 }
