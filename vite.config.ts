@@ -3,6 +3,7 @@ import vue from "@vitejs/plugin-vue";
 
 export default defineConfig({
     plugins: [vue()],
+    base: "/matched-betting-calculator/",
     server: {
         open: true
     }
