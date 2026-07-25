@@ -76,7 +76,7 @@ function valueClass(value: number): "positive" | "negative" {
               <span class="label">
                 Lay stake
               </span>
-              <span class="value" :class="valueClass(result.layStake)">
+              <span class="value"">
                 {{ result.layStake.toFixed(2) }}
               </span>
             </div>
