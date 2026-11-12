@@ -1,5 +1,6 @@
-export type BetType = "normal" | "free" | "riskfree";
+export type BetType = "normal" | "free" | "riskfree" | "multiway";
 export type FreebetOutcome = "1" | "X" | "2";
+export type FreebetMarketType = "two" | "three";
 
 export interface CalculationResult {
     layStake: number;
@@ -36,7 +37,7 @@ export function calculate(
     backOdds: number,
     layOdds: number,
     commission: number,
-    betType: BetType,
+    betType: Exclude<BetType, "multiway">,
     freebetRtp: number,
 ): CalculationResult {
     let layStake = 0;
@@ -95,47 +96,49 @@ export function calculateFreebetHedge(
     stake: number,
     freebetOutcome: FreebetOutcome,
     odds: FreebetOdds,
+    marketType: FreebetMarketType = "three",
 ): FreebetHedgeResult {
     if (!Number.isFinite(stake) || stake <= 0) {
         throw new Error("Freebet size must be greater than 0.");
     }
 
-    for (const outcome of ["1", "X", "2"] as const) {
+    const marketOutcomes: FreebetOutcome[] = marketType === "two" ? ["1", "2"] : ["1", "X", "2"];
+    if (!marketOutcomes.includes(freebetOutcome)) {
+        throw new Error("The freebet selection must be one of the selected market outcomes.");
+    }
+
+    for (const outcome of marketOutcomes) {
         if (!Number.isFinite(odds[outcome]) || odds[outcome] <= 1) {
-            throw new Error("All odds must be greater than 1.");
+            throw new Error("All market odds must be greater than 1.");
         }
     }
 
     const freebetProfit = stake * (odds[freebetOutcome] - 1);
     const hedges: Partial<Record<FreebetOutcome, number>> = {};
 
-    for (const outcome of ["1", "X", "2"] as const) {
+    for (const outcome of marketOutcomes) {
         if (outcome !== freebetOutcome) {
             hedges[outcome] = roundCurrency(freebetProfit / odds[outcome]);
         }
     }
 
     const totalHedge = Object.values(hedges).reduce((sum, hedge) => sum + hedge, 0);
-    const results: FreebetOutcomeResult[] = (["1", "X", "2"] as const).map((outcome) => {
+    const results: FreebetOutcomeResult[] = marketOutcomes.map((outcome) => {
         const net =
             outcome === freebetOutcome
                 ? freebetProfit - totalHedge
                 : (hedges[outcome] ?? 0) * odds[outcome] - totalHedge;
 
-        return {
-            outcome,
-            net: roundCurrency(net),
-        };
+        return { outcome, net: roundCurrency(net) };
     });
 
     const guaranteedProfit = Math.min(...results.map(({ net }) => net));
-    const conversion = guaranteedProfit / stake;
 
     return {
         odds,
         hedges,
         totalHedge,
-        conversion,
+        conversion: guaranteedProfit / stake,
         results,
     };
 }
