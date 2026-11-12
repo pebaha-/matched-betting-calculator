@@ -28,7 +28,7 @@ export interface FreebetHedgeResult {
     hedges: Partial<Record<FreebetOutcome, number>>;
     totalHedge: number;
     conversion: number;
-    expectedProfit: number;
+    guaranteedProfit: number;
     results: FreebetOutcomeResult[];
 }
 
@@ -117,10 +117,6 @@ export function calculateFreebetHedge(
     }
 
     const totalHedge = Object.values(hedges).reduce((sum, hedge) => sum + hedge, 0);
-    const conversion =
-        1 -
-        Object.values(hedges).reduce((sum, hedge) => sum + hedge / freebetProfit, 0);
-
     const results: FreebetOutcomeResult[] = (["1", "X", "2"] as const).map((outcome) => {
         const net =
             outcome === freebetOutcome
@@ -133,12 +129,17 @@ export function calculateFreebetHedge(
         };
     });
 
+    // Conversion is the hedged profit as a percentage of the freebet's face value.
+    // With no outcome probabilities, report the minimum net result as guaranteed profit.
+    const guaranteedProfit = Math.min(...results.map(({ net }) => net));
+    const conversion = guaranteedProfit / stake;
+
     return {
         odds,
         hedges,
         totalHedge,
         conversion,
-        expectedProfit: stake * conversion,
+        guaranteedProfit,
         results,
     };
 }
