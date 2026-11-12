@@ -9,8 +9,16 @@ const backOdds = ref(2.0);
 const layOdds = ref(2.0);
 const commissionPercent = ref(6.5);
 const freebetRtp = ref(70);
+
 const result = computed(() =>
-  calculate(backStake.value, backOdds.value, layOdds.value, commissionPercent.value / 100, betType.value, freebetRtp.value),
+  calculate(
+    backStake.value,
+    backOdds.value,
+    layOdds.value,
+    commissionPercent.value / 100,
+    betType.value,
+    freebetRtp.value,
+  ),
 );
 
 const freebetStake = ref(100);
@@ -18,6 +26,8 @@ const freebetOutcome = ref<FreebetOutcome>("X");
 const odds1 = ref(2.5);
 const oddsX = ref(3.2);
 const odds2 = ref(2.8);
+const outcomes = ["1", "X", "2"] as const;
+
 const freebetError = computed(() => {
   if (!Number.isFinite(freebetStake.value) || freebetStake.value <= 0) {
     return "Freebet size must be greater than 0.";
@@ -27,6 +37,7 @@ const freebetError = computed(() => {
   }
   return "";
 });
+
 const freebetResult = computed(() => {
   if (freebetError.value) return null;
   return calculateFreebetHedge(freebetStake.value, freebetOutcome.value, {
@@ -35,7 +46,6 @@ const freebetResult = computed(() => {
     "2": odds2.value,
   });
 });
-const outcomes = ["1", "X", "2"] as const;
 
 function valueClass(value: number): "positive" | "negative" {
   return value >= 0 ? "positive" : "negative";
@@ -46,10 +56,20 @@ function valueClass(value: number): "positive" | "negative" {
   <main>
     <div class="container">
       <nav class="calculator-tabs" aria-label="Calculator type">
-        <button type="button" :class="{ active: activeCalculator === 'matched' }" :aria-pressed="activeCalculator === 'matched'" @click="activeCalculator = 'matched'">
+        <button
+          type="button"
+          :class="{ active: activeCalculator === 'matched' }"
+          :aria-pressed="activeCalculator === 'matched'"
+          @click="activeCalculator = 'matched'"
+        >
           Matched betting
         </button>
-        <button type="button" :class="{ active: activeCalculator === 'freebet' }" :aria-pressed="activeCalculator === 'freebet'" @click="activeCalculator = 'freebet'">
+        <button
+          type="button"
+          :class="{ active: activeCalculator === 'freebet' }"
+          :aria-pressed="activeCalculator === 'freebet'"
+          @click="activeCalculator = 'freebet'"
+        >
           Freebet conversion
         </button>
       </nav>
@@ -57,7 +77,8 @@ function valueClass(value: number): "positive" | "negative" {
       <div v-if="activeCalculator === 'matched'" class="panel">
         <div class="card">
           <h1>Matched Betting Calculator</h1>
-          <label>Bet type
+          <label>
+            Bet type
             <select v-model="betType">
               <option value="normal">Normal</option>
               <option value="free">Free Bet (SNR)</option>
@@ -68,11 +89,15 @@ function valueClass(value: number): "positive" | "negative" {
           <label>Back odds<input v-model.number="backOdds" type="number" step="0.01" /></label>
           <label>Lay odds<input v-model.number="layOdds" type="number" step="0.01" /></label>
           <label>Commission (%)<input v-model.number="commissionPercent" type="number" step="0.1" /></label>
-          <label v-if="betType === 'riskfree'">Free bet RTP (%)<input v-model.number="freebetRtp" type="number" step="1" /></label>
+          <label v-if="betType === 'riskfree'">
+            Free bet RTP (%)<input v-model.number="freebetRtp" type="number" step="1" />
+          </label>
         </div>
 
         <div class="card">
-          <div class="result"><div class="row highlight"><span class="label">Lay stake</span><span class="value">{{ result.layStake.toFixed(2) }}</span></div></div>
+          <div class="result">
+            <div class="row highlight"><span class="label">Lay stake</span><span class="value">{{ result.layStake.toFixed(2) }}</span></div>
+          </div>
           <div class="breakdown">
             <h2>Breakdown</h2>
             <div class="scenario">
@@ -97,7 +122,8 @@ function valueClass(value: number): "positive" | "negative" {
           <h1>Freebet Hedge Calculator</h1>
           <p class="description">Calculate two hedge stakes for a three-way market and see the resulting conversion and net result for each outcome.</p>
           <label>Freebet size (kr.)<input v-model.number="freebetStake" type="number" min="0.01" step="0.01" /></label>
-          <label>Freebet outcome
+          <label>
+            Freebet outcome
             <select v-model="freebetOutcome">
               <option value="1">1 — Home win</option>
               <option value="X">X — Draw</option>
@@ -116,7 +142,6 @@ function valueClass(value: number): "positive" | "negative" {
               <h2>Hedge summary</h2>
               <div class="row highlight"><span class="label">Total hedge</span><span class="value">{{ freebetResult.totalHedge.toFixed(2) }} kr.</span></div>
               <div class="row highlight"><span class="label">Conversion</span><span class="value" :class="valueClass(freebetResult.conversion)">{{ (freebetResult.conversion * 100).toFixed(2) }}%</span></div>
-              <div class="row"><span class="label">Guaranteed profit</span><span class="value" :class="valueClass(freebetResult.guaranteedProfit)">{{ freebetResult.guaranteedProfit.toFixed(2) }} kr.</span></div>
             </section>
             <section class="breakdown freebet-breakdown">
               <h2>Hedge stakes</h2>
