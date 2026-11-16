@@ -8,6 +8,20 @@ const backOdds = ref(2.0);
 const layOdds = ref(2.0);
 const commissionPercent = ref(6.5);
 const freebetRtp = ref(70);
+const marketType = ref<FreebetMarketType>("three");
+const riskfreeOutcome = ref<FreebetOutcome>("1");
+
+const outcomes = computed<FreebetOutcome[]>(() => marketType.value === "two" ? ["1", "2"] : ["1", "X", "2"]);
+const outcomeLabel = computed(() => riskfreeOutcome.value === "X" ? "Draw (X)" : `Outcome ${riskfreeOutcome.value}`);
+
+watch(marketType, (type) => {
+  if (type === "two" && riskfreeOutcome.value === "X") {
+    riskfreeOutcome.value = "1";
+  }
+  if (type === "two" && freebetOutcome.value === "X") {
+    freebetOutcome.value = "1";
+  }
+});
 
 const result = computed(() => {
   const standardBetType = betType.value === "multiway" ? "normal" : betType.value;
@@ -21,13 +35,21 @@ const result = computed(() => {
   );
 });
 
+const standardError = computed(() => {
+  if (!Number.isFinite(backStake.value) || backStake.value <= 0) return "Back stake must be greater than 0.";
+  if (!Number.isFinite(backOdds.value) || backOdds.value <= 1) return "Back odds must be greater than 1.";
+  if (!Number.isFinite(layOdds.value) || layOdds.value <= 1) return "Lay odds must be greater than 1.";
+  if (!Number.isFinite(commissionPercent.value) || commissionPercent.value < 0 || commissionPercent.value >= 100) return "Commission must be between 0 and 100.";
+  if (betType.value === "riskfree" && (!Number.isFinite(freebetRtp.value) || freebetRtp.value < 0 || freebetRtp.value > 100)) return "Free bet RTP must be between 0 and 100.";
+  return "";
+});
+
 const freebetStake = ref(100);
-const marketType = ref<FreebetMarketType>("three");
 const freebetOutcome = ref<FreebetOutcome>("X");
 const odds1 = ref(2.5);
 const oddsX = ref(3.2);
 const odds2 = ref(2.8);
-const outcomes = computed<FreebetOutcome[]>(() => marketType.value === "two" ? ["1", "2"] : ["1", "X", "2"]);
+const freebetOutcomes = computed<FreebetOutcome[]>(() => marketType.value === "two" ? ["1", "2"] : ["1", "X", "2"]);
 
 watch(marketType, (type) => {
   if (type === "two" && freebetOutcome.value === "X") {
@@ -39,7 +61,7 @@ const freebetError = computed(() => {
   if (!Number.isFinite(freebetStake.value) || freebetStake.value <= 0) {
     return "Freebet size must be greater than 0.";
   }
-  const marketOdds = outcomes.value.map((outcome) => ({
+  const marketOdds = freebetOutcomes.value.map((outcome) => ({
     "1": odds1.value,
     X: oddsX.value,
     "2": odds2.value,
@@ -96,7 +118,7 @@ function valueClass(value: number): "positive" | "negative" {
             <label>
               Freebet outcome
               <select v-model="freebetOutcome">
-                <option v-for="outcome in outcomes" :key="outcome" :value="outcome">{{ outcome }}</option>
+                <option v-for="outcome in freebetOutcomes" :key="outcome" :value="outcome">{{ outcome }}</option>
               </select>
             </label>
             <label>
@@ -114,13 +136,29 @@ function valueClass(value: number): "positive" | "negative" {
           </template>
 
           <template v-else>
-            <label>Back stake<input v-model.number="backStake" type="number" step="0.01" /></label>
-            <label>Back odds<input v-model.number="backOdds" type="number" step="0.01" /></label>
-            <label>Lay odds<input v-model.number="layOdds" type="number" step="0.01" /></label>
-            <label>Commission (%)<input v-model.number="commissionPercent" type="number" step="0.1" /></label>
+            <template v-if="betType === 'riskfree'">
+              <label>
+                Market outcomes
+                <select v-model="marketType">
+                  <option value="two">Two outcomes (1, 2)</option>
+                  <option value="three">Three outcomes (1, X, 2)</option>
+                </select>
+              </label>
+              <label>
+                Qualifying bet outcome
+                <select v-model="riskfreeOutcome">
+                  <option v-for="outcome in outcomes" :key="outcome" :value="outcome">{{ outcome }}</option>
+                </select>
+              </label>
+              <p class="help-text">Place the qualifying bet on this outcome. The free bet is awarded only if it loses.</p>
+            </template>
+            <label>Back stake (kr.)<input v-model.number="backStake" type="number" min="0.01" step="0.01" /></label>
+            <label>Back odds<input v-model.number="backOdds" type="number" min="1.01" step="0.01" /></label>
+            <label>Lay odds<input v-model.number="layOdds" type="number" min="1.01" step="0.01" /></label>
+            <label>Commission (%)<input v-model.number="commissionPercent" type="number" min="0" max="99.99" step="0.1" /></label>
             <label v-if="betType === 'riskfree'">
               Free bet RTP (%)
-              <input v-model.number="freebetRtp" type="number" step="1" />
+              <input v-model.number="freebetRtp" type="number" min="0" max="100" step="1" />
             </label>
           </template>
         </div>
@@ -131,18 +169,12 @@ function valueClass(value: number): "positive" | "negative" {
             <template v-else-if="freebetResult">
               <section class="freebet-summary" aria-label="Multiway hedge summary">
                 <h2>Hedge summary</h2>
-                <div class="row highlight">
-                  <span class="label">Total hedge</span>
-                  <span class="value">{{ freebetResult.totalHedge.toFixed(2) }} kr.</span>
-                </div>
-                <div class="row highlight">
-                  <span class="label">Conversion</span>
-                  <span class="value" :class="valueClass(freebetResult.conversion)">{{ (freebetResult.conversion * 100).toFixed(2) }}%</span>
-                </div>
+                <div class="row highlight"><span class="label">Total hedge</span><span class="value">{{ freebetResult.totalHedge.toFixed(2) }} kr.</span></div>
+                <div class="row highlight"><span class="label">Conversion</span><span class="value" :class="valueClass(freebetResult.conversion)">{{ (freebetResult.conversion * 100).toFixed(2) }}%</span></div>
               </section>
               <section class="breakdown freebet-breakdown">
                 <h2>Hedge stakes</h2>
-                <div v-for="outcome in outcomes" :key="outcome" class="row">
+                <div v-for="outcome in freebetOutcomes" :key="outcome" class="row">
                   <span class="label">Outcome {{ outcome }} (odds {{ freebetResult.odds[outcome].toFixed(2) }})</span>
                   <span v-if="outcome === freebetOutcome" class="value muted">Freebet selection</span>
                   <span v-else class="value">{{ freebetResult.hedges[outcome]!.toFixed(2) }} kr.</span>
@@ -160,25 +192,29 @@ function valueClass(value: number): "positive" | "negative" {
           </template>
 
           <template v-else>
-            <div class="result">
-              <div class="row highlight"><span class="label">Lay stake</span><span class="value">{{ result.layStake.toFixed(2) }}</span></div>
-            </div>
-            <div class="breakdown">
-              <h2>Breakdown</h2>
-              <div class="scenario">
-                <h3>If Bookmaker (Back) bet wins</h3>
-                <div class="row"><span class="label">Bookmaker</span><span class="value" :class="valueClass(result.bookmakerBackWin)">{{ result.bookmakerBackWin.toFixed(2) }}</span></div>
-                <div class="row"><span class="label">Exchange</span><span class="value" :class="valueClass(result.exchangeBackWin)">{{ result.exchangeBackWin.toFixed(2) }}</span></div>
-                <div class="row total"><span class="label">Total</span><span class="value" :class="valueClass(result.profitBackWins)">{{ result.profitBackWins.toFixed(2) }}</span></div>
+            <p v-if="standardError" class="error-message" role="alert">{{ standardError }}</p>
+            <template v-else>
+              <p v-if="betType === 'riskfree'" class="help-text">Risk-free offer: a {{ backStake.toFixed(2) }} kr. qualifying bet on {{ outcomeLabel }} earns a free bet only if that bet loses.</p>
+              <div class="result">
+                <div class="row highlight"><span class="label">Lay stake</span><span class="value">{{ result.layStake.toFixed(2) }} kr.</span></div>
               </div>
-              <div class="scenario">
-                <h3>If Exchange (Lay) bet wins</h3>
-                <div class="row"><span class="label">Bookmaker</span><span class="value" :class="valueClass(result.bookmakerLayWin)">{{ result.bookmakerLayWin.toFixed(2) }}</span></div>
-                <div class="row"><span class="label">Exchange</span><span class="value" :class="valueClass(result.exchangeLayWin)">{{ result.exchangeLayWin.toFixed(2) }}</span></div>
-                <div v-if="betType === 'riskfree'" class="row"><span class="label">Free Bet</span><span class="value" :class="valueClass(result.freebetLayWin)">{{ result.freebetLayWin.toFixed(2) }}</span></div>
-                <div class="row total"><span class="label">Total</span><span class="value" :class="valueClass(result.profitLayWins)">{{ result.profitLayWins.toFixed(2) }}</span></div>
+              <div class="breakdown">
+                <h2>Breakdown</h2>
+                <div class="scenario">
+                  <h3>If bookmaker bet wins ({{ outcomeLabel }})</h3>
+                  <div class="row"><span class="label">Bookmaker</span><span class="value" :class="valueClass(result.bookmakerBackWin)">{{ result.bookmakerBackWin.toFixed(2) }}</span></div>
+                  <div class="row"><span class="label">Exchange</span><span class="value" :class="valueClass(result.exchangeBackWin)">{{ result.exchangeBackWin.toFixed(2) }}</span></div>
+                  <div class="row total"><span class="label">Total</span><span class="value" :class="valueClass(result.profitBackWins)">{{ result.profitBackWins.toFixed(2) }}</span></div>
+                </div>
+                <div class="scenario">
+                  <h3>If bookmaker bet loses</h3>
+                  <div class="row"><span class="label">Bookmaker</span><span class="value" :class="valueClass(result.bookmakerLayWin)">{{ result.bookmakerLayWin.toFixed(2) }}</span></div>
+                  <div class="row"><span class="label">Exchange</span><span class="value" :class="valueClass(result.exchangeLayWin)">{{ result.exchangeLayWin.toFixed(2) }}</span></div>
+                  <div v-if="betType === 'riskfree'" class="row"><span class="label">Free bet value (RTP)</span><span class="value" :class="valueClass(result.freebetLayWin)">{{ result.freebetLayWin.toFixed(2) }}</span></div>
+                  <div class="row total"><span class="label">Total</span><span class="value" :class="valueClass(result.profitLayWins)">{{ result.profitLayWins.toFixed(2) }}</span></div>
+                </div>
               </div>
-            </div>
+            </template>
           </template>
         </div>
       </div>
@@ -210,6 +246,7 @@ input:focus, select:focus { outline: none; border-color: #4f8cff; box-shadow: 0 
 .muted { color: #777; font-size: 13px; }
 .positive { color: #16a34a; }
 .negative { color: #dc2626; }
+.help-text { color: #555; font-size: 14px; line-height: 1.5; }
 .error-message, .warning-message { border-radius: 8px; padding: 12px 14px; font-size: 14px; }
 .error-message { background: #fef2f2; color: #b91c1c; }
 .warning-message { margin-bottom: 0; background: #fffbeb; color: #92400e; }
